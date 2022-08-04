@@ -1,0 +1,31 @@
+name: Stanging Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: install node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14.x"
+      - name: npm install & npm run build
+        run: |
+          npm ci
+          npm run build
+        env:
+          NEXT_PUBLIC_URL_PREFIX: reservation_systems
+      - name: FTP-Deploy-Action
+        uses: SamKirkland/FTP-Deploy-Action@4.2.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./out/
+          server-dir: zaty.jp/public_html/api/Reservation-Systems/
